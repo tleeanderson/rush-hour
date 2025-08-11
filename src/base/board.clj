@@ -117,8 +117,8 @@
     mv-veh-k
     move-func
     res]
-   (let [[loc val] (move-func board-veh mv-veh-k)]
-     (if val
+   (let [[loc valid?] (move-func board-veh mv-veh-k)]
+     (if valid?
        (let [{{{new-loc :location} mv-veh-k} :vehicle
               :as new-board-veh} (invoke-move board-veh mv-veh-k loc)]
          (one-direct-veh-move new-board-veh mv-veh-k move-func (into res new-loc)))
