@@ -106,7 +106,7 @@
   [moves]
   (apply concat (map (fn [[ck mvs]]
                        (let [ms (partition 2 mvs)]
-                         (map (fn [k m] 
+                         (map (fn [k m]
                                 [k (vec m)]) (take (count ms) (repeat ck)) ms))) moves)))
 
 (defn enumerate-paths
@@ -134,3 +134,42 @@
                                              aps (conj trav n-bv) (inc depth) md)]
                   (recur res trav cp (clojure.set/union aps n-aps) nd))))))
         moves traveled curr-path all-paths max-depth)))))
+
+
+(defn bf-enumerate-paths
+  ([board-veh obj-k]
+   (bf-enumerate-paths board-veh (flatten-moves (compress-moves board-veh obj-k)) board/end-state?
+                       compress-moves flatten-moves board/invoke-move obj-k [] #{} #{board-veh} 0 Integer/MAX_VALUE))
+  ([board-veh moves es-func? gen-moves-func flat-func inv-move-func obj-k curr-path all-paths traveled
+    depth max-depth]
+   (if (> depth max-depth)
+     [all-paths max-depth]
+     (if (es-func? board-veh obj-k)
+       (do
+         (println "hit end state, depth: " depth)
+         [(conj all-paths curr-path) depth])
+       (let [frontier (set (map (fn [[ck mp :as mv]]
+                                  [mv (inv-move-func board-veh ck mp)]) moves))
+             end-boards (set (filter #(es-func? (second %) :unused)
+                                     frontier))
+             non-end-boards (clojure.set/difference frontier end-boards)]
+         (let []
+           ;compute end-board stuff no matter what, and then loop over non-end-boards, where the values
+           ;from end-board are passed into recursive calls for non-end-board. Could also do depth stuff here.
+           )
+
+         (if (not (empty? end-boards))
+           )
+
+         (if (empty? end-boards)
+           ((fn [[[[ck mp :as mv] n-bv] & res] trav cp aps md]
+              (if (nil? ck)
+                [aps md]
+                (let [[n-aps nd] (bf-enumerate-paths n-bv (flat-func (gen-moves-func n-bv obj-k)) es-func?
+                                          gen-moves-func flat-func inv-move-func obj-k (conj cp [ck mp])
+                                          aps (conj trav n-bv) (inc depth) max-depth)]
+                  (recur res trav cp (clojure.set/union aps n-aps) nd))))
+            non-end-boards traveled curr-path all-paths max-depth)
+           ()
+           ))
+       ))))
