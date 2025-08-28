@@ -144,6 +144,7 @@
     depth max-depth]
    (let [frontier (set (map (fn [[ck mp :as mv]]
                               [mv (inv-move-func board-veh ck mp)]) moves))
+         n-trv (clojure.set/union traveled (map #(second %) frontier))
          end-boards (set (filter #(es-func? (second %) :unused)
                                  frontier))
          non-end-boards (clojure.set/difference frontier end-boards)
@@ -157,5 +158,4 @@
                                                aps (conj trav n-bv) (inc depth) max-depth)]
             (recur res trav cp (clojure.set/union aps n-aps) nd))))
       non-end-boards traveled curr-path all-paths max-depth))
-
    ))
