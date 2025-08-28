@@ -158,4 +158,4 @@
             (recur res trav cp (clojure.set/union aps n-aps) nd))))
       non-end-boards traveled curr-path all-paths max-depth))
 
-   \))
+   ))
