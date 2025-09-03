@@ -135,7 +135,6 @@
                   (recur res trav cp (clojure.set/union aps n-aps) nd))))))
         moves traveled curr-path all-paths max-depth)))))
 
-
 (defn bf-enumerate-paths
   ([board-veh obj-k]
    (bf-enumerate-paths board-veh (flatten-moves (compress-moves board-veh obj-k)) board/end-state?
@@ -150,12 +149,11 @@
          non-end-boards (clojure.set/difference frontier end-boards)
          aps-with-ebs [(clojure.set/union all-paths (set (map (fn [[mv _]]
                                                                 (conj curr-path mv)) end-boards))) depth]]
-     ((fn [[[[ck mp :as mv] n-bv] & res] trav cp aps md]
+     ((fn [[[[ck mp :as mv] n-bv] & res] trav cp aps cd next-depth md]
         (if (nil? ck)
-          [aps md]
+          [aps cd]
           (let [[n-aps nd] (bf-enumerate-paths n-bv (flat-func (gen-moves-func n-bv obj-k)) es-func?
                                                gen-moves-func flat-func inv-move-func obj-k (conj cp [ck mp])
-                                               aps (conj trav n-bv) (inc depth) max-depth)]
-            (recur res trav cp (clojure.set/union aps n-aps) nd))))
-      non-end-boards traveled curr-path all-paths max-depth))
-   ))
+                                               aps trav next-depth md)]
+            (recur res trav cp (clojure.set/union aps n-aps) cd next-depth md))))
+      non-end-boards n-trv curr-path aps-with-ebs depth (inc depth) max-depth))))
